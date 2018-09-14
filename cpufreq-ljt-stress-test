@@ -221,14 +221,13 @@ end
             end
         }
         test_failed = true if subtest_failed
-        printf(subtest_failed ? " FAILED\n" : " OK\n")
-        if test_failed == true
-        then
-            core = 8
-            break
-        end           
-            
+        printf(subtest_failed ? " FAILED\n" : " OK\n")           
     }
+    if test_failed == true
+    then
+        core = 8
+        break
+    end
 }
 killall stress
 printf("\nOverall result : %s\n", (test_failed ? "FAILED" : "PASSED"))
