@@ -140,6 +140,10 @@ def set_userspace_governor(core)
     return false if not governor
     return governor.strip == "userspace"
 end
+    
+def set_conservative_governor(core)
+    write_file("/sys/devices/system/cpu/cpu#{core}/cpufreq/scaling_governor", "conservative")
+end    
 
 def set_freq(core, freq)
     write_file("/sys/devices/system/cpu/cpu#{core}/cpufreq/scaling_setspeed", freq.to_s)
@@ -189,6 +193,11 @@ end
     if not set_userspace_governor(core) then
         raise "Can't set the userspace cpufreq governor"
     end
+    
+    if core > 3
+    then
+        set_conservative_governor(0)
+    end        
 
     freq_list = get_freq_list(core)
     freq_list.sort.reverse.each {|freq|
@@ -200,7 +209,7 @@ end
         end
         subtest_failed = false
         expected_result = `taskset -c #{core} #{$djpeg} #{shellescaped_jpgname} | md5sum`
-        1.upto(60) {
+        1.upto(3) {
             printf(".")
             STDOUT.flush
             if `taskset -c #{core} #{$djpeg} #{shellescaped_jpgname} | md5sum` != expected_result
@@ -211,7 +220,15 @@ end
         }
         test_failed = true if subtest_failed
         printf(subtest_failed ? " FAILED\n" : " OK\n")
+        if test_failed == true
+        then
+            break
+        end           
+            
     }
 }
 
 printf("\nOverall result : %s\n", (test_failed ? "FAILED" : "PASSED"))
+set_conservative_governor(0)
+set_conservative_governor(4)
+ 
