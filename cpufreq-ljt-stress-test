@@ -222,6 +222,7 @@ end
         printf(subtest_failed ? " FAILED\n" : " OK\n")
         if test_failed == true
         then
+            core = 8
             break
         end           
             
