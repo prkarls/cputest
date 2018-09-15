@@ -203,7 +203,7 @@ end
         raise "Can't set the userspace cpufreq governor"
     end
     
-    if core > 3
+    if core == 4
     then
         set_conservative_governor(0)
     end        
@@ -228,11 +228,14 @@ end
             end
         }
         test_failed = true if subtest_failed
-        printf(subtest_failed ? " FAILED\n" : " OK\n")           
+        printf(subtest_failed ? " FAILED\n" : " OK\n")          
+        if test_failed == true
+        then
+            break
+        end    
     }
     if test_failed == true
     then
-        core = 8
         break
     end
 }
