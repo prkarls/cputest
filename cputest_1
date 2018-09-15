@@ -163,7 +163,8 @@ def get_freq_list(core)
 end
 
 def get_static_freq_list(core)
-    {1200000 984000 696000}
+    freq_list = "408000 696000 984000 1200000"
+    return freq_list.split(" ").map {|x| x.to_i}
 end    
     
 jpgname = File.join(File.dirname(__FILE__), "whitenoise-1920x1080.jpg")
@@ -196,7 +197,7 @@ thread = Thread.new do
     `nohup ./stress -c 7 2>&1 > /dev/null < /dev/null &`
 end
     
-0.upto(number_of_cpu_cores - 1) {|core|
+(number_of_cpu_cores - 1).downto(0) {|core|
     printf("\nTesting CPU %d\n", core)
     if not set_userspace_governor(core) then
         raise "Can't set the userspace cpufreq governor"
@@ -208,7 +209,7 @@ end
     end        
 
     freq_list = get_static_freq_list(core)
-    freq_list.sort.reverse.each {|freq|
+    freq_list.each {|freq|
         printf("%5d MHz ", freq / 1000)
         if freq < min_freq * 1000 or freq > max_freq * 1000 or not set_freq(core, freq)
         then
@@ -217,7 +218,7 @@ end
         end
         subtest_failed = false
         expected_result = `taskset -c #{core} #{$djpeg} #{shellescaped_jpgname} | md5sum`
-        1.upto(3) {
+        1.upto(4) {
             printf(".")
             STDOUT.flush
             if `taskset -c #{core} #{$djpeg} #{shellescaped_jpgname} | md5sum` != expected_result
