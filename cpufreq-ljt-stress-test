@@ -188,7 +188,9 @@ if ARGV[0] and ARGV[1] then
            min_freq, max_freq)
 end
 
-./stress -c 7 &
+thread = Thread.new do
+    `nohup ./stress -c 7 2>&1 > /dev/null < /dev/null &`
+end
     
 0.upto(number_of_cpu_cores - 1) {|core|
     printf("\nTesting CPU %d\n", core)
@@ -229,7 +231,7 @@ end
         break
     end
 }
-killall stress
+`killall stress`
 printf("\nOverall result : %s\n", (test_failed ? "FAILED" : "PASSED"))
 set_conservative_governor(0)
 set_conservative_governor(4)
