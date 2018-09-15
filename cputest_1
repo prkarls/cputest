@@ -162,6 +162,10 @@ def get_freq_list(core)
     return freq_list.split(" ").map {|x| x.to_i}
 end
 
+def get_static_freq_list(core)
+    {1200000 984000 696000}
+end    
+    
 jpgname = File.join(File.dirname(__FILE__), "whitenoise-1920x1080.jpg")
 shellescaped_jpgname = Shellwords.escape(jpgname)
 
@@ -203,7 +207,7 @@ end
         set_conservative_governor(0)
     end        
 
-    freq_list = get_freq_list(core)
+    freq_list = get_static_freq_list(core)
     freq_list.sort.reverse.each {|freq|
         printf("%5d MHz ", freq / 1000)
         if freq < min_freq * 1000 or freq > max_freq * 1000 or not set_freq(core, freq)
